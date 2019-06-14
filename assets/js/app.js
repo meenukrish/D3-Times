@@ -43,22 +43,6 @@ function renderYaxis(newYScale, yAxis) {
 }
 
 
-function settextgroup(chartGroup, estimatedata, chosenXAxis,chosenYAxis)
-{
-var textGroup = chartGroup.selectAll()
-.data(estimatedata)
-.exit()
-.remove()
-.append("text")
-.text(function(d){ return d.abbr})
-.attr("x", d => xLinearScale(d[chosenXAxis]))
-.attr("y", d => yLinearScale(d[chosenYAxis]))
-.attr("font-size","9px")
-.attr("fill","white");
-
-return textGroup;
-
-}
 
 function renderXCircles(circlesGroup, textGroup, newXScale, chosenXAxis) {
 
@@ -68,10 +52,10 @@ function renderXCircles(circlesGroup, textGroup, newXScale, chosenXAxis) {
 
   textGroup.transition()
     .duration(1000)
-    .attr("cx", d => newXScale(d[chosenXAxis]));
+    .attr("x", d => newXScale(d[chosenXAxis]));
 
 
-  return circlesGroup;
+  return [circlesGroup, textGroup];
 }
 
 function renderYCircles(circlesGroup, textGroup, newYScale, chosenYAxis) {
@@ -82,9 +66,9 @@ function renderYCircles(circlesGroup, textGroup, newYScale, chosenYAxis) {
 
     textGroup.transition()
     .duration(1000)
-    .attr("cy", d => newYScale(d[chosenYAxis]));
+    .attr("y", d => newYScale(d[chosenYAxis]));
 
-  return circlesGroup;
+  return [circlesGroup, textGroup];
 }
 
 
@@ -226,9 +210,9 @@ var circlesGroup = chartGroup.selectAll("circle")
 .append("circle")
 .attr("cx", d => xLinearScale(d[chosenXAxis]))
 .attr("cy", d => yLinearScale(d[chosenYAxis]))
-.attr("r", 15)
+.attr("r", 10)
 .attr("fill", "#2059b5")
-.attr("opacity", ".75")
+.attr("opacity", ".95")
 .classed("stateCircle" , true);
 
 
@@ -240,6 +224,8 @@ var textGroup = chartGroup.selectAll(null)
 .text(function(d){ return d.abbr})
 .attr("x", d => xLinearScale(d[chosenXAxis]))
 .attr("y", d => yLinearScale(d[chosenYAxis]))
+.attr("dy", "4")
+.attr("dx", "-5")
 .attr("font-size","9px")
 .attr("fill","white");
 
@@ -327,10 +313,9 @@ xlabelsGroup.selectAll("text")
     // updates x axis with transition
     xAxis = renderXaxis(xLinearScale, xAxis);
 
-    textGroup = settextgroup(xAxis, estimatedata, chosenXAxis, chosenYAxis)
-
+    
    // updates circles with new x values
-    circlesXGroup = renderXCircles(circlesGroup, textGroup, xLinearScale, chosenXAxis);
+    [circlesXGroup, textGroup] = renderXCircles(circlesGroup, textGroup, xLinearScale, chosenXAxis);
 
     // updates tooltips with new info
     circlesXGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesXGroup);
@@ -387,9 +372,8 @@ ylabelsGroup.selectAll("text")
     // updates x axis with transition
     yAxis = renderYaxis(yLinearScale, yAxis);
 
-    textGroup = settextgroup(yAxis, estimatedata, chosenXAxis, chosenYAxis)
     // updates circles with new y values
-    circlesYGroup = renderYCircles(circlesGroup, textGroup, yLinearScale, chosenYAxis);
+    [circlesYGroup, textGroup] = renderYCircles(circlesGroup, textGroup, yLinearScale, chosenYAxis);
 
     // updates tooltips with new info
     circlesYGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesYGroup);
@@ -433,10 +417,9 @@ else {
 });
 
 
-
 });  //d3.csv end
 
-}; //makeresponsive function end
+}; //makeresponsive functionend
 
 makeResponsive();
 
